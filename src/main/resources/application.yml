@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/point?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    # ??? local? ??? ??: localhost +  ?? ??? 3307 ??
+    # ?? ?????? ??? ???? localhost -> mysql_server, 3307 -> 3306
+    # ??? ?? ????? ??? ?? ?? ??? 3307? ??? ??.
+    username:
+    password:
+  jpa:
+    database: mysql   # dialect ??
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect # dialect ??
+  sql:
+    init:
+      data-locations: classpath*:db/mysql/data.sql
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+server:
+  servlet:
+    encoding:
+      force-response: true
