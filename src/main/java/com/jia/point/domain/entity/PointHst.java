@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
+@Builder(builderMethodName = "entityBuilder", toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "POINT_HISTORY")
@@ -24,6 +24,8 @@ public class PointHst {
     private Long pointHstIdx;
 
     private BigDecimal value; // 금액
+
+    @Enumerated(EnumType.STRING)
     private PointType pointType; // 적립 or 사용
 
     //============= 연관관계 ============

@@ -3,6 +3,10 @@ package com.jia.point.infrastructure;
 import com.jia.point.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface MemberRepository extends JpaRepository<Member, String> {
+
+    Optional<Member> findByMemberIdx(Long memberIdx);
 
 }

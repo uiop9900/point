@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
+@Builder(builderMethodName = "entityBuilder", toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "POINT")
@@ -23,7 +23,7 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pointIdx;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private UseStatus useStatus; // 사용여부
 
     private BigDecimal originValue; // 포인트 적립금
