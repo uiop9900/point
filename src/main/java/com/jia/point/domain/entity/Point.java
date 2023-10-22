@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "POINT")
+@Slf4j
 public class Point {
 
     @Id
@@ -37,4 +39,16 @@ public class Point {
     @JoinColumn(name = "member_idx")
     private Member member;
 
+    public void usingPoint(BigDecimal useValue) {
+        this.useStatus = UseStatus.USING;
+        this.remainValue = this.remainValue.subtract(useValue);
+        log.error("remainValue = {}", this.remainValue);
+        this.updDt = LocalDateTime.now();
+    }
+
+    public void useAllPoint() {
+        this.useStatus = UseStatus.COMPLETE;
+        this.remainValue = BigDecimal.ZERO;
+        this.updDt = LocalDateTime.now();
+    }
 }

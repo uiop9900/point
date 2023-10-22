@@ -20,6 +20,11 @@ public class PointRestController {
 
     private final PointFacade pointFacade;
 
+    @PostMapping("/redis")
+    public void resetRedisValue() {
+        memberFacade.resetRedisValue();
+    }
+
     @PostMapping("/member")
     public void createMember(@RequestBody CreateMemberRequest request) {
         memberFacade.signUpMember(MemberDto.Create.toCommand(request));
@@ -33,6 +38,13 @@ public class PointRestController {
         return pointFacade.earnPoint(PointDto.Create.toCommand(request));
     }
 
+    /**
+     * 포인트 사용
+     */
+    @PostMapping("/point:use")
+    public BigDecimal usePoint(@RequestBody UsePointRequest request) {
+        return pointFacade.usePoint(PointDto.Use.toCommand(request));
+    }
 
 
 }

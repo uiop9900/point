@@ -41,6 +41,7 @@ public class Member {
         return Member.builder()
                 .name(command.getName())
                 .phoneNumber(command.getPhoneNumber())
+                .regDt(LocalDateTime.now())
                 .build();
     }
 }

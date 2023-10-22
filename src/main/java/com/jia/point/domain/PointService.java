@@ -7,4 +7,7 @@ import java.math.BigDecimal;
 public interface PointService {
     @Transactional
     BigDecimal createPoint(PointDto.Create command);
+
+    @Transactional
+    BigDecimal usePoint(PointDto.Use command);
 }

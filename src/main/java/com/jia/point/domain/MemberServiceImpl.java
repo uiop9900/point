@@ -15,10 +15,14 @@ public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
 
+    private final RedisService redisService;
+
     @Override
     @Transactional
     public void insertMember(MemberDto.Create command) {
         Member toSave = Member.toEntity(command);
         memberRepository.save(toSave);
     }
+
+
 }

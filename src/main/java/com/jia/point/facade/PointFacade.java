@@ -13,11 +13,13 @@ public class PointFacade {
 
     private final PointService pointService;
 
-
     public BigDecimal earnPoint(PointDto.Create command) {
         return pointService.createPoint(command);
     }
 
+    public BigDecimal usePoint(PointDto.Use command) {
+        return pointService.usePoint(command);
+    }
 
 
 

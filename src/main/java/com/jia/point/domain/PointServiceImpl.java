@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -39,6 +41,7 @@ public class PointServiceImpl implements PointService {
                 .originValue(command.getPoint())
                 .remainValue(command.getPoint())
                 .useStatus(UseStatus.UNUSED)
+                .regDt(LocalDateTime.now())
                 .build();
         pointRepository.save(point);
 
@@ -47,6 +50,7 @@ public class PointServiceImpl implements PointService {
                 .member(member)
                 .value(command.getPoint())
                 .pointType(PointType.EARN)
+                .regDt(LocalDateTime.now())
                 .build();
         pointHistoryRepository.save(pointHst);
 
@@ -56,6 +60,58 @@ public class PointServiceImpl implements PointService {
         redisService.saveValue(member.getMemberIdx(), totalPointValue);
 
         return totalPointValue;
+    }
+
+    @Override
+    @Transactional
+    public BigDecimal usePoint(PointDto.Use command) {
+        // member 확인
+        Member member = memberReader.findByMemberId(command.getMemberId());
+
+        // redis 에서 확인
+        BigDecimal canUsePoint = redisService.getValue(command.getMemberId());
+
+        BigDecimal toUse = command.getUsePoint(); // 사용할 포인트
+        if (toUse.compareTo(canUsePoint) == 1) { // 사용불가
+         throw new IllegalArgumentException("It is exceed saved point");
+        }
+
+        //point에서 오래된 point 꺼내서 상태변경
+        List<Point> points = pointRepository.findPointsByMemberId(command.getMemberId());
+
+        Boolean endWhenZero = true;
+        for (Point point : points) {
+            if (endWhenZero) {
+                if (toUse.compareTo(point.getRemainValue()) == 0) {
+                    point.useAllPoint();
+                    endWhenZero = false;
+                } else if (toUse.compareTo(point.getRemainValue()) < 0) { // 사용할 포인트가 더 적음
+                    point.usingPoint(toUse);
+                    endWhenZero = false;
+                } else if (toUse.compareTo(point.getRemainValue()) > 0) {
+                    toUse = toUse.subtract(point.getRemainValue());
+                    point.useAllPoint();
+                }
+            } else {
+                break;
+            }
+
+        }
+
+        //point_hst 저장
+        PointHst pointHst = PointHst.entityBuilder()
+                .member(member)
+                .value(command.getUsePoint())
+                .pointType(PointType.USE)
+                .regDt(LocalDateTime.now())
+                .build();
+        pointHistoryRepository.save(pointHst);
+
+        //레디스에 새로운 값 저장
+        BigDecimal totalPoint = canUsePoint.subtract(command.getUsePoint());
+        redisService.saveValue(member.getMemberIdx(), totalPoint);
+
+        return totalPoint;
     }
 
 }

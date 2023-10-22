@@ -27,4 +27,8 @@ public class RedisService {
         }
         return bigDecimal;
     }
+
+    public void resetRedisValue() {
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
+    }
 }

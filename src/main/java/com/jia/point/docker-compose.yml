@@ -21,8 +21,8 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ./redis/data:/data
-      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+      - /Users/jialee/study/point/redis/data:/data
+      - /Users/jialee/study/point/redis/conf/redis.conf:/usr/local/conf/redis.conf
     labels:
       - "name=redis"
       - "mode=standalone"
