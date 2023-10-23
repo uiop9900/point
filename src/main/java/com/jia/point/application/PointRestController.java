@@ -1,16 +1,17 @@
 package com.jia.point.application;
 
 import com.jia.point.application.create_member.CreateMemberRequest;
-import com.jia.point.domain.MemberDto;
-import com.jia.point.domain.PointDto;
+import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.PointDto;
+import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.facade.MemberFacade;
 import com.jia.point.facade.PointFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +47,13 @@ public class PointRestController {
         return pointFacade.usePoint(PointDto.Use.toCommand(request));
     }
 
+
+    /**
+     * 포인트 내역 조회
+     */
+    @GetMapping("/point?{page}")
+    public GetPointHistoriesResponse getPointHistories(@PathVariable String page) {
+        return GetPointHistoriesResponse.of(pointFacade.getPointHistories(Integer.valueOf(page == null ? "0" : page)));
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.jia.point.domain.entity;
 
+import com.jia.point.common.converter.LocalDateConverter;
 import com.jia.point.domain.enums.UseStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,6 +32,9 @@ public class Point {
 
     private BigDecimal originValue; // 포인트 적립금
     private BigDecimal remainValue; // 남은 금액(사용가능 금액)
+
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate expiredDate; // 만료일자
 
     private LocalDateTime regDt;
     private LocalDateTime updDt;

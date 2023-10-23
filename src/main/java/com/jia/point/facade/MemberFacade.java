@@ -1,6 +1,6 @@
 package com.jia.point.facade;
 
-import com.jia.point.domain.MemberDto;
+import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.domain.MemberService;
 import com.jia.point.domain.RedisService;
 import lombok.RequiredArgsConstructor;

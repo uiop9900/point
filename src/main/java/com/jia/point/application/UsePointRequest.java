@@ -1,6 +1,5 @@
 package com.jia.point.application;
 
-import com.jia.point.domain.PointDto;
 import lombok.Builder;
 import lombok.Data;
 

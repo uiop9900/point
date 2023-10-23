@@ -1,5 +1,6 @@
 package com.jia.point.domain;
 
+import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,12 @@ public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
 
-    private final RedisService redisService;
-
     @Override
     @Transactional
     public void insertMember(MemberDto.Create command) {
         Member toSave = Member.toEntity(command);
-        memberRepository.save(toSave);
+        Member save = memberRepository.save(toSave);
+        log.error("memberIdx = {}", save.getMemberIdx().toString());
     }
 
 

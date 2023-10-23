@@ -1,6 +1,6 @@
 package com.jia.point.domain.entity;
 
-import com.jia.point.domain.MemberDto;
+import com.jia.point.domain.dtos.MemberDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

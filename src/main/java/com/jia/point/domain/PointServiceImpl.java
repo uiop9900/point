@@ -1,18 +1,24 @@
 package com.jia.point.domain;
 
+import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.enums.PointType;
 import com.jia.point.domain.enums.UseStatus;
+import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.infrastructure.PointHistoryRepository;
 import com.jia.point.infrastructure.PointRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +27,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PointServiceImpl implements PointService {
+
+    private final Integer SELECT_SIZE = 10;
 
     private final PointRepository pointRepository;
 
@@ -40,6 +48,7 @@ public class PointServiceImpl implements PointService {
                 .member(member)
                 .originValue(command.getPoint())
                 .remainValue(command.getPoint())
+                .expiredDate(LocalDate.now().plusYears(1))
                 .useStatus(UseStatus.UNUSED)
                 .regDt(LocalDateTime.now())
                 .build();
@@ -114,4 +123,10 @@ public class PointServiceImpl implements PointService {
         return totalPoint;
     }
 
+    @Override
+    public List<PointHstInfo> getPointHistories(Integer page) {
+        Pageable pageable = PageRequest.of(page, SELECT_SIZE);
+        Page<PointHst> list = pointHistoryRepository.findAll(pageable);
+        return list.stream().map(PointHstInfo::of).toList();
+    }
 }
