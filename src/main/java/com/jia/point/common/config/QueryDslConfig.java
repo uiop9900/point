@@ -1,4 +1,4 @@
-package com.jia.point.config;
+package com.jia.point.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

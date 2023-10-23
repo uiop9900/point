@@ -1,4 +1,4 @@
-package com.jia.point.config;
+package com.jia.point.common.config;
 
 import io.netty.handler.logging.LogLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.jia.point.domain;
+package com.jia.point.domain.dtos;
 
 import com.jia.point.application.CreatePointRequest;
 import com.jia.point.application.UsePointRequest;
