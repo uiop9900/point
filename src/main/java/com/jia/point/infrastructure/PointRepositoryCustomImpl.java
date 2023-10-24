@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.jia.point.domain.entity.QPoint.point;
@@ -25,6 +26,15 @@ public class PointRepositoryCustomImpl implements PointRepositoryCustom {
                 )
                 .orderBy(point.regDt.asc())
                 .fetch();
+    }
+
+    @Override
+    public List<Point> findPointAfterToday(LocalDate today) {
+        return queryFactory.selectFrom(point)
+                .where(
+                        point.expiredDate.eq(today)
+                                .and(point.useStatus.in(UseStatus.USING, UseStatus.UNUSED))
+                ).fetch();
     }
 
 }

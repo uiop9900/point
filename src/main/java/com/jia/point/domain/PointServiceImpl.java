@@ -129,4 +129,28 @@ public class PointServiceImpl implements PointService {
         Page<PointHst> list = pointHistoryRepository.findAll(pageable);
         return list.stream().map(PointHstInfo::of).toList();
     }
+
+    @Override
+    @Transactional
+    public Integer expirePoints() {
+        List<Point> pointAfterToday = pointRepository.findPointAfterToday(LocalDate.now());
+
+        for (Point point : pointAfterToday) {
+            // point - 만료
+            point.expired();
+            // pointHst - 만료로 쌓는다.
+            PointHst toSave = PointHst.entityBuilder()
+                    .value(point.getRemainValue())
+                    .pointType(PointType.EXPIRED)
+                    .member(point.getMember())
+                    .build();
+
+            pointHistoryRepository.save(toSave);
+
+            // redis - 계산해서 담는다.
+            BigDecimal value = redisService.getValue(point.getMember().getMemberIdx());
+            redisService.saveValue(point.getMember().getMemberIdx(), value.subtract(point.getRemainValue()));
+        }
+        return pointAfterToday.size();
+    }
 }

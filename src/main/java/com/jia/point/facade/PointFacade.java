@@ -28,5 +28,8 @@ public class PointFacade {
         return pointService.getPointHistories(page);
     }
 
+    public Integer expirePoints() {
+        return pointService.expirePoints();
+    }
 
 }

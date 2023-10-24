@@ -56,4 +56,9 @@ public class Point {
         this.remainValue = BigDecimal.ZERO;
         this.updDt = LocalDateTime.now();
     }
+
+    public void expired() {
+        this.useStatus = UseStatus.EXPIRED;
+        this.updDt = LocalDateTime.now();
+    }
 }
