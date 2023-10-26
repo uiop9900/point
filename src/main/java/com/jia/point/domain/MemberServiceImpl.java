@@ -1,5 +1,6 @@
 package com.jia.point.domain;
 
+import com.jia.point.common.annotation.RedissonLock;
 import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.infrastructure.MemberRepository;
@@ -18,6 +19,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
+    @RedissonLock(key = "member")
     public void insertMember(MemberDto.Create command) {
         Member toSave = Member.toEntity(command);
         Member save = memberRepository.save(toSave);

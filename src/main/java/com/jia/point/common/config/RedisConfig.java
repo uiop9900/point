@@ -47,7 +47,6 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    // redisson
     @Bean
     public RedissonClient redissonClient() {
         RedissonClient redisson = null;

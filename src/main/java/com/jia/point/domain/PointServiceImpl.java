@@ -1,5 +1,6 @@
 package com.jia.point.domain;
 
+import com.jia.point.common.annotation.RedissonLock;
 import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
@@ -40,6 +41,7 @@ public class PointServiceImpl implements PointService {
 
     @Transactional
     @Override
+    @RedissonLock(key = "point")
     public BigDecimal createPoint(PointDto.Create command) {
         Member member = memberReader.findByMemberId(command.getMemberId());
 
@@ -73,6 +75,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
+    @RedissonLock(key = "point")
     public BigDecimal usePoint(PointDto.Use command) {
         // member 확인
         Member member = memberReader.findByMemberId(command.getMemberId());
@@ -132,6 +135,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
+    @RedissonLock(key = "point")
     public Integer expirePoints() {
         List<Point> pointAfterToday = pointRepository.findPointAfterToday(LocalDate.now());
 

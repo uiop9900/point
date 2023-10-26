@@ -26,11 +26,17 @@ public class PointRestController {
 
     private final PointFacade pointFacade;
 
+    /**
+     * 레디스 데이터 초기화
+     */
     @PostMapping("/redis")
     public void resetRedisValue() {
         memberFacade.resetRedisValue();
     }
 
+    /**
+     * 회원가입
+     */
     @PostMapping("/member")
     public void createMember(@RequestBody CreateMemberRequest request) {
         memberFacade.signUpMember(MemberDto.Create.toCommand(request));
@@ -39,7 +45,7 @@ public class PointRestController {
     /**
      * 포인트 적립
      */
-    @PostMapping("/point")
+    @PostMapping("/point:earn")
     public BigDecimal createPoint(@RequestBody CreatePointRequest request) {
         return pointFacade.earnPoint(PointDto.Create.toCommand(request));
     }
@@ -62,13 +68,13 @@ public class PointRestController {
     }
 
     /**
-     * 포인트 내역 조회
+     * 포인트 만료
      */
     @PostMapping("/point/{today}")
     @Scheduled(cron = "0 4 * * * ") // 매일 새벽 5시
     public void expirePoints() {
-        log.info("[SCHEDULED} 포인트 만료 시작합니다. today = {}", LocalDate.now());
+        log.info("[SCHEDULED] 포인트 만료 시작합니다. today = {}", LocalDate.now());
         Integer points = pointFacade.expirePoints();
-        log.info("[SCHEDULED} 포인트 만료 종료합니다. expirePontsNumber ={}", points);
+        log.info("[SCHEDULED] 포인트 만료 종료합니다. expirePontsNumber ={}", points);
     }
 }
