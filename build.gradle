@@ -28,6 +28,8 @@ dependencies {
 
 	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// redisson
+	implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
 
 	//Querydsl 추가
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
