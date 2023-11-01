@@ -3,19 +3,16 @@ package com.jia.point.application;
 import com.jia.point.application.create_member.CreateMemberRequest;
 import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.domain.dtos.PointDto;
-import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.facade.MemberFacade;
 import com.jia.point.facade.PointFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

@@ -5,9 +5,11 @@ import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
+import com.jia.point.domain.entity.PointHstPoint;
 import com.jia.point.domain.enums.PointType;
 import com.jia.point.domain.enums.UseStatus;
 import com.jia.point.domain.dtos.PointHstInfo;
+import com.jia.point.infrastructure.PointHistoryPointRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
 import com.jia.point.infrastructure.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -35,6 +40,8 @@ public class PointServiceImpl implements PointService {
 
     private final PointHistoryRepository pointHistoryRepository;
 
+    private final PointHistoryPointRepository pointHistoryPointRepository;
+
     private final MemberReader memberReader;
 
     private final RedisService redisService;
@@ -46,7 +53,7 @@ public class PointServiceImpl implements PointService {
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // point 적립
-        Point point = Point.entityBuilder()
+        Point point = Point.builder()
                 .member(member)
                 .originValue(command.getPoint())
                 .remainValue(command.getPoint())
@@ -57,7 +64,7 @@ public class PointServiceImpl implements PointService {
         pointRepository.save(point);
 
         // point_hst 에 적립
-        PointHst pointHst = PointHst.entityBuilder()
+        PointHst pointHst = PointHst.builder()
                 .member(member)
                 .value(command.getPoint())
                 .pointType(PointType.EARN)
@@ -91,33 +98,46 @@ public class PointServiceImpl implements PointService {
         //point에서 오래된 point 꺼내서 상태변경
         List<Point> points = pointRepository.findPointsByMemberId(command.getMemberId());
 
+        Map<Point, BigDecimal> usePoint = new HashMap<>();
         Boolean endWhenZero = true;
         for (Point point : points) {
             if (endWhenZero) {
                 if (toUse.compareTo(point.getRemainValue()) == 0) {
                     point.useAllPoint();
                     endWhenZero = false;
+                    usePoint.put(point, point.getRemainValue());
                 } else if (toUse.compareTo(point.getRemainValue()) < 0) { // 사용할 포인트가 더 적음
                     point.usingPoint(toUse);
                     endWhenZero = false;
+                    usePoint.put(point, toUse);
                 } else if (toUse.compareTo(point.getRemainValue()) > 0) {
                     toUse = toUse.subtract(point.getRemainValue());
                     point.useAllPoint();
+                    usePoint.put(point, point.getRemainValue());
                 }
             } else {
                 break;
             }
-
         }
 
         //point_hst 저장
-        PointHst pointHst = PointHst.entityBuilder()
+        PointHst pointHst = PointHst.builder()
                 .member(member)
                 .value(command.getUsePoint())
                 .pointType(PointType.USE)
                 .regDt(LocalDateTime.now())
                 .build();
-        pointHistoryRepository.save(pointHst);
+
+        // point_hst_point에 저장
+        PointHst saveHst = pointHistoryRepository.save(pointHst);
+        for (Point point : usePoint.keySet()) {
+            PointHstPoint pointHstPoint = PointHstPoint.builder()
+                    .point(point)
+                    .useValue(usePoint.get(point))
+                    .pointHst(saveHst)
+                    .build();
+            pointHistoryPointRepository.save(pointHstPoint);
+        }
 
         //레디스에 새로운 값 저장
         BigDecimal totalPoint = canUsePoint.subtract(command.getUsePoint());
@@ -143,7 +163,7 @@ public class PointServiceImpl implements PointService {
             // point - 만료
             point.expired();
             // pointHst - 만료로 쌓는다.
-            PointHst toSave = PointHst.entityBuilder()
+            PointHst toSave = PointHst.builder()
                     .value(point.getRemainValue())
                     .pointType(PointType.EXPIRED)
                     .member(point.getMember())
