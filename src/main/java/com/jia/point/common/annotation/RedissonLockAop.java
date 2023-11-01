@@ -36,17 +36,21 @@ public class RedissonLockAop {
         RLock rLock = redissonClient.getLock(key);
 
         try {
-            boolean available = rLock.tryLock(redissonLock.waitTime(), redissonLock.leaseTime(), redissonLock.timeUnit());  // (2)
+            boolean available = rLock.tryLock(redissonLock.waitTime(), redissonLock.leaseTime(), redissonLock.timeUnit());
+            log.info("[lock을 시도합니다.]");
             if (!available) {
                 return false;
             }
 
-            return aopForTransaction.proceed(joinPoint);  // 따로 정의된 proceed를 호출함 -> 매번 new Transactional
+            log.info("[proceed를 호출합니다.]");
+            return joinPoint.proceed();
+//            return aopForTransaction.proceed(joinPoint);  // 따로 정의된 proceed를 호출함 -> 매번 new Transactional
         } catch (InterruptedException e) {
             throw new InterruptedException();
         } finally {
             try {
                 rLock.unlock();
+                log.info("[unLock을 시도합니다.]");
             } catch (IllegalMonitorStateException e) {
                 log.info("[Redisson Lock Already UnLock] method = {}, key = {}",
                          method.getName(), key);
