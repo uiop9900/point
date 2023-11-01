@@ -6,16 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder(builderMethodName = "entityBuilder", toBuilder = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "POINT_HISTORY")
+@DynamicUpdate
 public class PointHst {
 
     @Id

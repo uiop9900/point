@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder(builderMethodName = "entityBuilder", toBuilder = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "POINT")
-@Slf4j
+@DynamicUpdate
 public class Point {
 
     @Id
@@ -47,7 +47,6 @@ public class Point {
     public void usingPoint(BigDecimal useValue) {
         this.useStatus = UseStatus.USING;
         this.remainValue = this.remainValue.subtract(useValue);
-        log.error("remainValue = {}", this.remainValue);
         this.updDt = LocalDateTime.now();
     }
 
