@@ -3,10 +3,13 @@ package com.jia.point.domain;
 import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
+import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.enums.PointType;
+import com.jia.point.domain.enums.UseStatus;
 import com.jia.point.infrastructure.MemberRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
+import com.jia.point.infrastructure.PointRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -18,8 +21,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -32,6 +37,9 @@ class PointServiceImplTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    PointRepository pointRepository;
 
     @Autowired
     PointHistoryRepository pointHistoryRepository;
@@ -50,14 +58,15 @@ class PointServiceImplTest {
                 .build();
         Member save = memberRepository.save(toSave);
 
-        for (int i = 0; i < 100; i++) {
-            PointHst pointHst = PointHst.builder()
-                    .member(save)
-                    .pointType(PointType.EARN)
-                    .value(BigDecimal.ONE)
-                    .build();
-            pointHistoryRepository.save(pointHst);
-        }
+//        for (int i = 0; i < 100; i++) {
+//            PointHst pointHst = PointHst.builder()
+//                    .member(save)
+//                    .pointType(PointType.EARN)
+//                    .value(BigDecimal.ONE)
+//                    .build();
+//            pointHistoryRepository.save(pointHst);
+//        }
+
     }
 
     @Test
@@ -130,6 +139,35 @@ class PointServiceImplTest {
 
         // then
         assertThat(list.size()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("포인트만료_success")
+    void expire_points_일정시간에_포인트들이_만료된다() {
+        // given : 포인트들이 저장된 상태
+
+        Optional<Member> member = memberRepository.findByMemberIdx(1L);
+        for (int i = 0; i < 10; i++) {
+            Point point = Point.builder()
+                    .originValue(BigDecimal.ONE)
+                    .remainValue(BigDecimal.ONE)
+                    .expiredDate(i % 2 == 0 ? LocalDate.now() : LocalDate.now().plusYears(1))
+                    .useStatus(UseStatus.UNUSED)
+                    .regDt(LocalDateTime.now().minusYears(1))
+                    .member(
+                            member.get()
+                    )
+                    .build();
+
+            Point saved = pointRepository.save(point);
+            log.error("==============={}", saved.getExpiredDate());
+        }
+
+        // when
+        Integer expirePoints = pointService.expirePoints();
+
+        // then
+        assertThat(expirePoints).isEqualTo(5);
     }
 
     private void flushAndClear() {

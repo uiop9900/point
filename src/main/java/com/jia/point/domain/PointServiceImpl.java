@@ -155,7 +155,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
-    @RedissonLock(key = "point")
+//    @RedissonLock(key = "point")
     public Integer expirePoints() {
         List<Point> pointAfterToday = pointRepository.findPointAfterToday(LocalDate.now());
 

@@ -40,8 +40,8 @@ public class Point {
     private LocalDateTime updDt;
 
     //============= 연관관계 ============
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_idx")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST) // cascade: 영속성 전이 : 특정 엔티티를 영속화 할때 같이 영속화된다.
+    @JoinColumn(name = "member_idx") // point 저장할때 member도 같이 영속성에 들어가서 저장된다.
     private Member member;
 
     public void usingPoint(BigDecimal useValue) {
