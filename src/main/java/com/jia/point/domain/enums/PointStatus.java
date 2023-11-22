@@ -3,7 +3,7 @@ package com.jia.point.domain.enums;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum UseStatus {
+public enum PointStatus {
     UNUSED("미사용"),
     USING("사용중"),
 

@@ -1,7 +1,7 @@
 package com.jia.point.infrastructure;
 
 import com.jia.point.domain.entity.Point;
-import com.jia.point.domain.enums.UseStatus;
+import com.jia.point.domain.enums.PointStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,7 +22,7 @@ public class PointRepositoryCustomImpl implements PointRepositoryCustom {
         return queryFactory.selectFrom(point)
                 .where(
                         point.member.memberIdx.eq(memberId)
-                                .and(point.useStatus.in(UseStatus.USING, UseStatus.UNUSED))
+                                .and(point.useStatus.in(PointStatus.USING, PointStatus.UNUSED))
                 )
                 .orderBy(point.regDt.asc())
                 .fetch();
@@ -33,7 +33,7 @@ public class PointRepositoryCustomImpl implements PointRepositoryCustom {
         return queryFactory.selectFrom(point)
                 .where(
                         point.expiredDate.eq(today)
-                                .and(point.useStatus.in(UseStatus.USING, UseStatus.UNUSED))
+                                .and(point.useStatus.in(PointStatus.USING, PointStatus.UNUSED))
                 ).fetch();
     }
 

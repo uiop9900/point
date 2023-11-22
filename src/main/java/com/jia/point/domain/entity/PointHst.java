@@ -11,6 +11,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 포인트 히스토리<br>
+ * : 포인트의 변경사항 모두 쌓인다.<br>
+ * 예시) 사용, 적립, 만료, 취소
+ */
 @Entity
 @Getter
 @Builder

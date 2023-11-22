@@ -1,18 +1,24 @@
 package com.jia.point.application;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.jia.point.application.create_member.CreateMemberRequest;
+import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.facade.MemberFacade;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class MemberRestController {
 
-    @RequestMapping("test")
-    @ResponseBody
-    public String test() {
-        return "test";
-    }
+    private final MemberFacade memberFacade;
 
+    /**
+     * 회원가입
+     */
+    @PostMapping("/member")
+    public void createMember(@RequestBody CreateMemberRequest request) {
+        memberFacade.signUpMember(MemberDto.Create.toCommand(request));
+    }
 
 }

@@ -7,7 +7,7 @@ import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.entity.PointHstPoint;
 import com.jia.point.domain.enums.PointType;
-import com.jia.point.domain.enums.UseStatus;
+import com.jia.point.domain.enums.PointStatus;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.infrastructure.PointHistoryPointRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class PointServiceImpl implements PointService {
                 .originValue(command.getPoint())
                 .remainValue(command.getPoint())
                 .expiredDate(LocalDate.now().plusYears(1))
-                .useStatus(UseStatus.UNUSED)
+                .useStatus(PointStatus.UNUSED)
                 .regDt(LocalDateTime.now())
                 .build();
         pointRepository.save(point);
@@ -107,7 +106,7 @@ public class PointServiceImpl implements PointService {
                     endWhenZero = false;
                     usePoint.put(point, point.getRemainValue());
                 } else if (toUse.compareTo(point.getRemainValue()) < 0) { // 사용할 포인트가 더 적음
-                    point.usingPoint(toUse);
+                    point.usePartOfPoint(toUse);
                     endWhenZero = false;
                     usePoint.put(point, toUse);
                 } else if (toUse.compareTo(point.getRemainValue()) > 0) {

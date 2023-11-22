@@ -1,4 +1,4 @@
-package com.jia.point.application;
+package com.jia.point.application.use_point;
 
 import lombok.Builder;
 import lombok.Data;

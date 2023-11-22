@@ -10,7 +10,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 
 /**
- * point와 point_hst의 중간 테이블
+ * point와 point_hst의 중간 테이블<br>
+ * 포인트 사용 취소를 위해 생성함.
  */
 @Entity
 @Getter

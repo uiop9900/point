@@ -4,9 +4,7 @@ import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
-import com.jia.point.domain.entity.PointHst;
-import com.jia.point.domain.enums.PointType;
-import com.jia.point.domain.enums.UseStatus;
+import com.jia.point.domain.enums.PointStatus;
 import com.jia.point.infrastructure.MemberRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
 import com.jia.point.infrastructure.PointRepository;
@@ -152,7 +150,7 @@ class PointServiceImplTest {
                     .originValue(BigDecimal.ONE)
                     .remainValue(BigDecimal.ONE)
                     .expiredDate(i % 2 == 0 ? LocalDate.now() : LocalDate.now().plusYears(1))
-                    .useStatus(UseStatus.UNUSED)
+                    .useStatus(PointStatus.UNUSED)
                     .regDt(LocalDateTime.now().minusYears(1))
                     .member(
                             member.get()

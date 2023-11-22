@@ -1,14 +1,14 @@
 package com.jia.point.application;
 
-import com.jia.point.application.create_member.CreateMemberRequest;
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.application.create_point.CreatePointRequest;
+import com.jia.point.application.get_histories.GetPointHistoriesResponse;
+import com.jia.point.application.use_point.UsePointRequest;
 import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.facade.MemberFacade;
 import com.jia.point.facade.PointFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -31,13 +31,6 @@ public class PointRestController {
         memberFacade.resetRedisValue();
     }
 
-    /**
-     * 회원가입
-     */
-    @PostMapping("/member")
-    public void createMember(@RequestBody CreateMemberRequest request) {
-        memberFacade.signUpMember(MemberDto.Create.toCommand(request));
-    }
 
     /**
      * 포인트 적립

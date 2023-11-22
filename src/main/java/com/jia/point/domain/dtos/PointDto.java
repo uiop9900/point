@@ -1,8 +1,7 @@
 package com.jia.point.domain.dtos;
 
-import com.jia.point.application.CreatePointRequest;
-import com.jia.point.application.UsePointRequest;
-import com.jia.point.application.create_member.CreateMemberRequest;
+import com.jia.point.application.create_point.CreatePointRequest;
+import com.jia.point.application.use_point.UsePointRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

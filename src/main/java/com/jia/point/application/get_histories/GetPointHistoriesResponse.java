@@ -1,4 +1,4 @@
-package com.jia.point.application;
+package com.jia.point.application.get_histories;
 
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.enums.PointType;
