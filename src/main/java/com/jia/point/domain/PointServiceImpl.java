@@ -5,8 +5,8 @@ import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
-import com.jia.point.domain.entity.PointHstPoint;
-import com.jia.point.domain.enums.PointType;
+import com.jia.point.domain.entity.PointHstRecord;
+import com.jia.point.domain.enums.PointUseType;
 import com.jia.point.domain.enums.PointStatus;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.infrastructure.PointHistoryPointRepository;
@@ -66,7 +66,7 @@ public class PointServiceImpl implements PointService {
         PointHst pointHst = PointHst.builder()
                 .member(member)
                 .value(command.getPoint())
-                .pointType(PointType.EARN)
+                .pointType(PointUseType.EARN)
                 .regDt(LocalDateTime.now())
                 .build();
         pointHistoryRepository.save(pointHst);
@@ -123,14 +123,14 @@ public class PointServiceImpl implements PointService {
         PointHst pointHst = PointHst.builder()
                 .member(member)
                 .value(command.getUsePoint())
-                .pointType(PointType.USE)
+                .pointType(PointUseType.USE)
                 .regDt(LocalDateTime.now())
                 .build();
 
         // point_hst_point에 저장
         PointHst saveHst = pointHistoryRepository.save(pointHst);
         for (Point point : usePoint.keySet()) {
-            PointHstPoint pointHstPoint = PointHstPoint.builder()
+            PointHstRecord pointHstPoint = PointHstRecord.builder()
                     .point(point)
                     .useValue(usePoint.get(point))
                     .pointHst(saveHst)
@@ -164,7 +164,7 @@ public class PointServiceImpl implements PointService {
             // pointHst - 만료로 쌓는다.
             PointHst toSave = PointHst.builder()
                     .value(point.getRemainValue())
-                    .pointType(PointType.EXPIRED)
+                    .pointType(PointUseType.EXPIRED)
                     .member(point.getMember())
                     .build();
 

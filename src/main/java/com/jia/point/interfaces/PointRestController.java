@@ -1,8 +1,8 @@
-package com.jia.point.application;
+package com.jia.point.interfaces;
 
-import com.jia.point.application.dtos.CommonResponse;
-import com.jia.point.application.dtos.CreatePointRequest;
-import com.jia.point.application.dtos.UsePointRequest;
+import com.jia.point.interfaces.dtos.CommonResponse;
+import com.jia.point.interfaces.dtos.CreatePointRequest;
+import com.jia.point.interfaces.dtos.UsePointRequest;
 import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.facade.MemberFacade;

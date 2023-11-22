@@ -1,4 +1,4 @@
-package com.jia.point.application.enums;
+package com.jia.point.interfaces.enums;
 
 import lombok.Getter;
 

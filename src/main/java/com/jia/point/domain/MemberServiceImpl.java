@@ -3,14 +3,16 @@ package com.jia.point.domain;
 import com.jia.point.common.annotation.RedissonLock;
 import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.domain.entity.Member;
+import com.jia.point.domain.exceptions.MemberException;
 import com.jia.point.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.procedure.ParameterMisuseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.jia.point.domain.exceptions.ErrorMessage.ALREADY_SIGN_UP;
 
 @Slf4j
 @Service
@@ -27,13 +29,11 @@ public class MemberServiceImpl implements MemberService{
         Optional<Member> member = memberRepository.findMemberByPhoneNumber(command.getPhoneNumber());
 
         if (member.isPresent()) {
-            log.error("이미 등록된 회원입니다.");
-            throw new ParameterMisuseException("이미 등록된 회원입니다.");
+            throw new MemberException(ALREADY_SIGN_UP, member.get().getMemberIdx());
         }
 
         Member toSave = Member.toEntity(command);
         Member save = memberRepository.save(toSave);
-        log.error("memberIdx = {}", save.getMemberIdx().toString());
     }
 
 

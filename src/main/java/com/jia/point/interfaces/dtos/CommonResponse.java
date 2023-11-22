@@ -1,6 +1,6 @@
-package com.jia.point.application.dtos;
+package com.jia.point.interfaces.dtos;
 
-import com.jia.point.application.enums.ResultCode;
+import com.jia.point.interfaces.enums.ResultCode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,8 +8,10 @@ import lombok.Getter;
 @Builder
 public class CommonResponse<T> {
 
-    private ResultCode result;
-    private T data;
+    private ResultCode result; // 성공여부
+    private T data; // 성공시 반환하는 객체
+    private String message; // 실패시 에러메세지
+
 
     public static <T> CommonResponse<T> success(T data) {
         return CommonResponse.<T>builder()
@@ -18,10 +20,11 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static <T> CommonResponse<T> fail(T data) {
+    public static <T> CommonResponse<T> fail(String message) {
         return CommonResponse.<T>builder()
                 .result(ResultCode.FAIL)
-                .data(data)
+                .message(message)
+                .data(null)
                 .build();
     }
 }

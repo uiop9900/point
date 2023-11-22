@@ -1,6 +1,6 @@
 package com.jia.point.domain.entity;
 
-import com.jia.point.domain.enums.PointType;
+import com.jia.point.domain.enums.PointUseType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +33,7 @@ public class PointHst {
     private BigDecimal value; // 금액
 
     @Enumerated(EnumType.STRING)
-    private PointType pointType; // 적립 or 사용
+    private PointUseType pointType; // 적립 or 사용
 
     //============= 연관관계 ============
     @ManyToOne(fetch = FetchType.LAZY)

@@ -18,20 +18,20 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@Table(name = "POINT_HST_POINT")
+@Table(name = "POINT_HST_RECORD")
 @DynamicUpdate
-public class PointHstPoint {
+public class PointHstRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idx;
 
+    @Column(name = "use_vale")
+    private BigDecimal useValue; // 당시 사용한 point의 remainValue
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "point_idx")
     private Point point;
-
-    @Column(name = "use_vale")
-    private BigDecimal useValue; // 당시 사용한 point의 remainValue
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "point_hst_idx")

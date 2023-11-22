@@ -1,7 +1,7 @@
 package com.jia.point.domain.dtos;
 
 import com.jia.point.domain.entity.PointHst;
-import com.jia.point.domain.enums.PointType;
+import com.jia.point.domain.enums.PointUseType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,7 +14,7 @@ public class PointHstInfo {
 
     private MemberInfo.Main member;
     private BigDecimal value;
-    private PointType pointType;
+    private PointUseType pointType;
 
     public static PointHstInfo of (PointHst hst) {
         return PointHstInfo.builder()

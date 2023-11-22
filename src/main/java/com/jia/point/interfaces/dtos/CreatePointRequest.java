@@ -1,4 +1,4 @@
-package com.jia.point.application.dtos;
+package com.jia.point.interfaces.dtos;
 
 import lombok.Builder;
 import lombok.Data;
