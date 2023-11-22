@@ -1,7 +1,6 @@
 package com.jia.point.domain.dtos;
 
-import com.jia.point.application.create_member.CreateMemberRequest;
-import com.jia.point.domain.entity.Member;
+import com.jia.point.application.dtos.CreateMemberRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

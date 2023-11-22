@@ -1,6 +1,7 @@
 package com.jia.point.application;
 
-import com.jia.point.application.create_member.CreateMemberRequest;
+import com.jia.point.application.dtos.CommonResponse;
+import com.jia.point.application.dtos.CreateMemberRequest;
 import com.jia.point.domain.dtos.MemberDto;
 import com.jia.point.facade.MemberFacade;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,9 @@ public class MemberRestController {
      * 회원가입
      */
     @PostMapping("/member")
-    public void createMember(@RequestBody CreateMemberRequest request) {
+    public CommonResponse<Boolean> createMember(@RequestBody CreateMemberRequest request) {
         memberFacade.signUpMember(MemberDto.Create.toCommand(request));
+        return CommonResponse.success(Boolean.TRUE);
     }
 
 }

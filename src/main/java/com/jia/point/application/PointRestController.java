@@ -1,9 +1,10 @@
 package com.jia.point.application;
 
-import com.jia.point.application.create_point.CreatePointRequest;
-import com.jia.point.application.get_histories.GetPointHistoriesResponse;
-import com.jia.point.application.use_point.UsePointRequest;
+import com.jia.point.application.dtos.CommonResponse;
+import com.jia.point.application.dtos.CreatePointRequest;
+import com.jia.point.application.dtos.UsePointRequest;
 import com.jia.point.domain.dtos.PointDto;
+import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.facade.MemberFacade;
 import com.jia.point.facade.PointFacade;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,16 +38,16 @@ public class PointRestController {
      * 포인트 적립
      */
     @PostMapping("/point:earn")
-    public BigDecimal createPoint(@RequestBody CreatePointRequest request) {
-        return pointFacade.earnPoint(PointDto.Create.toCommand(request));
+    public CommonResponse<BigDecimal> createPoint(@RequestBody CreatePointRequest request) {
+        return CommonResponse.success(pointFacade.earnPoint(PointDto.Create.toCommand(request)));
     }
 
     /**
      * 포인트 사용
      */
     @PostMapping("/point:use")
-    public BigDecimal usePoint(@RequestBody UsePointRequest request) {
-        return pointFacade.usePoint(PointDto.Use.toCommand(request));
+    public CommonResponse<BigDecimal> usePoint(@RequestBody UsePointRequest request) {
+        return CommonResponse.success(pointFacade.usePoint(PointDto.Use.toCommand(request)));
     }
 
 
@@ -53,8 +55,8 @@ public class PointRestController {
      * 포인트 내역 조회
      */
     @GetMapping("/point/{page}")
-    public GetPointHistoriesResponse getPointHistories(@PathVariable String page) {
-        return GetPointHistoriesResponse.of(pointFacade.getPointHistories(Integer.valueOf(page == null ? "0" : page)));
+    public CommonResponse<List<PointHstInfo>> getPointHistories(@PathVariable String page) {
+        return CommonResponse.success(pointFacade.getPointHistories(Integer.valueOf(page == null ? "0" : page)));
     }
 
     /**

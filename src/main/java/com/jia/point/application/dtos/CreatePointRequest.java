@@ -1,4 +1,4 @@
-package com.jia.point.application.use_point;
+package com.jia.point.application.dtos;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 
 @Builder
 @Data
-public class UsePointRequest {
+public class CreatePointRequest {
 
     private Long memberId;
-    private BigDecimal usePoint;
+    private BigDecimal point;
 
 }

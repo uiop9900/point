@@ -1,4 +1,4 @@
-package com.jia.point.application.create_member;
+package com.jia.point.application.dtos;
 
 import lombok.Builder;
 import lombok.Data;
