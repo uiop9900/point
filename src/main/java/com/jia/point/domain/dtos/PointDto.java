@@ -1,7 +1,14 @@
 package com.jia.point.domain.dtos;
 
+import com.jia.point.domain.entity.Member;
+import com.jia.point.domain.entity.Point;
+import com.jia.point.domain.entity.PointHst;
+import com.jia.point.domain.enums.PointStatus;
+import com.jia.point.domain.enums.PointUseType;
 import com.jia.point.interfaces.dtos.CreatePointRequest;
 import com.jia.point.interfaces.dtos.UsePointRequest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,11 +28,33 @@ public class PointDto {
         private Long memberId;
         private BigDecimal point;
 
-        public static Create toCommand(CreatePointRequest request) {
+        public static Create toCommand(CreatePointRequest request, String memberIdx) {
             return Create.builder()
-                    .memberId(request.getMemberId())
+                    .memberId(Long.valueOf(memberIdx))
                     .point(request.getPoint())
                     .build();
+        }
+
+        // point 적립
+        public Point toPointEntity(Member member) {
+            return Point.builder()
+                .member(member)
+                .originValue(point)
+                .remainValue(point)
+                .expiredDate(LocalDate.now().plusYears(1))
+                .useStatus(PointStatus.UNUSED)
+                .regDt(LocalDateTime.now())
+                .build();
+        }
+
+        // pointHst 적립
+        public PointHst toPointHstEntity(Member member) {
+            return PointHst.builder()
+                .member(member)
+                .value(point)
+                .pointType(PointUseType.EARN)
+                .regDt(LocalDateTime.now())
+                .build();
         }
     }
 
@@ -44,6 +73,15 @@ public class PointDto {
                     .memberId(request.getMemberId())
                     .usePoint(request.getUsePoint())
                     .build();
+        }
+
+        public PointHst toHstEntity(Member member) {
+            return PointHst.builder()
+                .member(member)
+                .value(usePoint)
+                .pointType(PointUseType.USE)
+                .regDt(LocalDateTime.now())
+                .build();
         }
     }
 }

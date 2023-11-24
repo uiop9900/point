@@ -37,9 +37,9 @@ public class PointRestController {
     /**
      * 포인트 적립
      */
-    @PostMapping("/point:earn")
-    public CommonResponse<BigDecimal> createPoint(@RequestBody CreatePointRequest request) {
-        return CommonResponse.success(pointFacade.earnPoint(PointDto.Create.toCommand(request)));
+    @PostMapping("/point/{memberIdx}")
+    public CommonResponse<BigDecimal> createPoint(@RequestBody CreatePointRequest request, @PathVariable("memberIdx") String memberIdx) {
+        return CommonResponse.success(pointFacade.earnPoint(PointDto.Create.toCommand(request, memberIdx)));
     }
 
     /**

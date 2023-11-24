@@ -33,7 +33,7 @@ public class MemberServiceImpl implements MemberService{
         }
 
         Member toSave = Member.toEntity(command);
-        Member save = memberRepository.save(toSave);
+        memberRepository.save(toSave);
     }
 
 

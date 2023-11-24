@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 @Data
 public class CreatePointRequest {
 
-    private Long memberId;
     private BigDecimal point;
 
 }

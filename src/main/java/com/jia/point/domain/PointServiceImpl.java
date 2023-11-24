@@ -52,24 +52,12 @@ public class PointServiceImpl implements PointService {
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // point 적립
-        Point point = Point.builder()
-                .member(member)
-                .originValue(command.getPoint())
-                .remainValue(command.getPoint())
-                .expiredDate(LocalDate.now().plusYears(1))
-                .useStatus(PointStatus.UNUSED)
-                .regDt(LocalDateTime.now())
-                .build();
-        pointRepository.save(point);
+        final Point pointSave = command.toPointEntity(member);
+        pointRepository.save(pointSave);
 
         // point_hst 에 적립
-        PointHst pointHst = PointHst.builder()
-                .member(member)
-                .value(command.getPoint())
-                .pointType(PointUseType.EARN)
-                .regDt(LocalDateTime.now())
-                .build();
-        pointHistoryRepository.save(pointHst);
+        final PointHst pointHstSave = command.toPointHstEntity(member);
+        pointHistoryRepository.save(pointHstSave);
 
         // redis에 저장
         BigDecimal value = redisService.getValue(member.getMemberIdx());
@@ -120,15 +108,10 @@ public class PointServiceImpl implements PointService {
         }
 
         //point_hst 저장
-        PointHst pointHst = PointHst.builder()
-                .member(member)
-                .value(command.getUsePoint())
-                .pointType(PointUseType.USE)
-                .regDt(LocalDateTime.now())
-                .build();
+        final PointHst hstEntity = command.toHstEntity(member);
+        PointHst saveHst = pointHistoryRepository.save(hstEntity);
 
-        // point_hst_point에 저장
-        PointHst saveHst = pointHistoryRepository.save(pointHst);
+        // point_hst_point에 저장(롤백을 위해)
         for (Point point : usePoint.keySet()) {
             PointHstRecord pointHstPoint = PointHstRecord.builder()
                     .point(point)
