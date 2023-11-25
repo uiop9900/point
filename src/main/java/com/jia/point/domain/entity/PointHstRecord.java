@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@Table(name = "POINT_HST_RECORD")
+@Table(name = "POINT_HST_POINT_RECORD")
 @DynamicUpdate
 public class PointHstRecord {
 

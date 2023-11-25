@@ -20,7 +20,7 @@ public class PointHstInfo {
         return PointHstInfo.builder()
                 .member(MemberInfo.Main.of(hst.getMember()))
                 .value(hst.getValue())
-                .pointType(hst.getPointType())
+                .pointType(hst.getPointUseType())
                 .build();
     }
 }

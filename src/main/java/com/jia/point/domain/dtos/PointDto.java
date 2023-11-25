@@ -52,7 +52,7 @@ public class PointDto {
             return PointHst.builder()
                 .member(member)
                 .value(point)
-                .pointType(PointUseType.EARN)
+                .pointUseType(PointUseType.EARN)
                 .regDt(LocalDateTime.now())
                 .build();
         }
@@ -79,7 +79,7 @@ public class PointDto {
             return PointHst.builder()
                 .member(member)
                 .value(usePoint)
-                .pointType(PointUseType.USE)
+                .pointUseType(PointUseType.USE)
                 .regDt(LocalDateTime.now())
                 .build();
         }

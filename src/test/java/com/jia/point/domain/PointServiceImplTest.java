@@ -4,7 +4,9 @@ import com.jia.point.domain.dtos.PointDto;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
+import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.enums.PointStatus;
+import com.jia.point.domain.enums.PointUseType;
 import com.jia.point.infrastructure.MemberRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
 import com.jia.point.infrastructure.PointRepository;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -56,14 +59,14 @@ class PointServiceImplTest {
                 .build();
         Member save = memberRepository.save(toSave);
 
-//        for (int i = 0; i < 100; i++) {
-//            PointHst pointHst = PointHst.builder()
-//                    .member(save)
-//                    .pointType(PointType.EARN)
-//                    .value(BigDecimal.ONE)
-//                    .build();
-//            pointHistoryRepository.save(pointHst);
-//        }
+        for (int i = 0; i < 100; i++) {
+            PointHst pointHst = PointHst.builder()
+                    .member(save)
+                    .pointUseType(PointUseType.EARN)
+                    .value(BigDecimal.ONE)
+                    .build();
+            pointHistoryRepository.save(pointHst);
+        }
 
     }
 
@@ -130,10 +133,11 @@ class PointServiceImplTest {
     @DisplayName("포인트조회_success")
     void get_point_histories_페이징되어서_조회된다() {
         // given
+        String memberIdx = "1";
         Integer page = 1;
 
         // when
-        List<PointHstInfo> list = pointService.getPointHistories(page);
+        List<PointHstInfo> list = pointService.getPointHistories(memberIdx, page);
 
         // then
         assertThat(list.size()).isEqualTo(10);

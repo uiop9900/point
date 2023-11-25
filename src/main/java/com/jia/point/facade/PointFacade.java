@@ -24,8 +24,8 @@ public class PointFacade {
     }
 
 
-    public List<PointHstInfo> getPointHistories(Integer page) {
-        return pointService.getPointHistories(page);
+    public List<PointHstInfo> getPointHistories(String memberIdx, Integer page) {
+        return pointService.getPointHistories(memberIdx, page);
     }
 
     public Integer expirePoints() {

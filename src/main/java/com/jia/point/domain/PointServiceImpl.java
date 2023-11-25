@@ -129,9 +129,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<PointHstInfo> getPointHistories(Integer page) {
+    public List<PointHstInfo> getPointHistories(String memberIdx, Integer page) {
+        Member member = memberReader.findByMemberId(Long.valueOf(memberIdx));
+
         Pageable pageable = PageRequest.of(page, SELECT_SIZE);
-        Page<PointHst> list = pointHistoryRepository.findAll(pageable);
+        Page<PointHst> list = pointHistoryRepository.findAllByMember(member, pageable);
+
         return list.stream().map(PointHstInfo::of).toList();
     }
 
@@ -147,7 +150,7 @@ public class PointServiceImpl implements PointService {
             // pointHst - 만료로 쌓는다.
             PointHst toSave = PointHst.builder()
                     .value(point.getRemainValue())
-                    .pointType(PointUseType.EXPIRED)
+                    .pointUseType(PointUseType.EXPIRED)
                     .member(point.getMember())
                     .build();
 

@@ -51,13 +51,7 @@ public class PointRestController {
     }
 
 
-    /**
-     * 포인트 내역 조회
-     */
-    @GetMapping("/point/{page}")
-    public CommonResponse<List<PointHstInfo>> getPointHistories(@PathVariable String page) {
-        return CommonResponse.success(pointFacade.getPointHistories(Integer.valueOf(page == null ? "0" : page)));
-    }
+
 
     /**
      * 포인트 만료

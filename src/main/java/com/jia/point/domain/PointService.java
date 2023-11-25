@@ -14,7 +14,7 @@ public interface PointService {
 
     @Transactional
     BigDecimal usePoint(PointDto.Use command);
-    List<PointHstInfo> getPointHistories(Integer page);
+    List<PointHstInfo> getPointHistories(String memberIdx, Integer page);
 
     Integer expirePoints();
 }

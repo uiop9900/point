@@ -24,7 +24,6 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
-    @RedissonLock(key = "member")
     public void insertMember(MemberDto.Create command) {
         Optional<Member> member = memberRepository.findMemberByPhoneNumber(command.getPhoneNumber());
 

@@ -33,7 +33,7 @@ public class PointHst {
     private BigDecimal value; // 금액
 
     @Enumerated(EnumType.STRING)
-    private PointUseType pointType; // 적립 or 사용
+    private PointUseType pointUseType; // 적립 or 사용
 
     //============= 연관관계 ============
     @ManyToOne(fetch = FetchType.LAZY)
