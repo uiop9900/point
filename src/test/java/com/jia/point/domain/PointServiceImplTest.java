@@ -1,6 +1,6 @@
 package com.jia.point.domain;
 
-import com.jia.point.domain.dtos.PointDto;
+import com.jia.point.domain.dtos.PointCommand;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -76,7 +75,7 @@ class PointServiceImplTest {
         // given
         Long memberId = 1L;
         BigDecimal point = BigDecimal.valueOf(500);
-        PointDto.Create toSave = PointDto.Create.builder()
+        PointCommand.Create toSave = PointCommand.Create.builder()
                 .memberId(memberId)
                 .point(point)
                 .build();
@@ -95,7 +94,7 @@ class PointServiceImplTest {
         // given
         Long memberId = 1L;
         BigDecimal point = BigDecimal.valueOf(300);
-        PointDto.Use toUpdate = PointDto.Use.builder()
+        PointCommand.Use toUpdate = PointCommand.Use.builder()
                 .memberId(memberId)
                 .usePoint(point)
                 .build();
@@ -116,7 +115,7 @@ class PointServiceImplTest {
         BigDecimal canUse = redisService.getValue(memberId);
         BigDecimal tryUse = canUse.add(BigDecimal.valueOf(1000));
 
-        PointDto.Use toUpdate = PointDto.Use.builder()
+        PointCommand.Use toUpdate = PointCommand.Use.builder()
                 .memberId(memberId)
                 .usePoint(tryUse)
                 .build();

@@ -1,13 +1,12 @@
 package com.jia.point.domain;
 
 import com.jia.point.common.annotation.RedissonLock;
-import com.jia.point.domain.dtos.PointDto;
+import com.jia.point.domain.dtos.PointCommand;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.entity.PointHstRecord;
 import com.jia.point.domain.enums.PointUseType;
-import com.jia.point.domain.enums.PointStatus;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.infrastructure.PointHistoryPointRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
@@ -22,10 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.jia.point.domain.entity.Point.canUse;
 
 @Slf4j
 @Service
@@ -48,7 +48,7 @@ public class PointServiceImpl implements PointService {
     @Transactional
     @Override
     @RedissonLock(key = "point")
-    public BigDecimal createPoint(PointDto.Create command) {
+    public BigDecimal createPoint(PointCommand.Create command) {
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // point 적립
@@ -70,42 +70,25 @@ public class PointServiceImpl implements PointService {
     @Override
     @Transactional
     @RedissonLock(key = "point")
-    public BigDecimal usePoint(PointDto.Use command) {
+    public BigDecimal usePoint(PointCommand.Use command) {
+        // 사용할 포인트
+        BigDecimal toUse = command.getUsePoint();
+
         // member 확인
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // redis 에서 확인
-        BigDecimal canUsePoint = redisService.getValue(command.getMemberId());
+        BigDecimal myPoint = redisService.getValue(command.getMemberId());
 
-        BigDecimal toUse = command.getUsePoint(); // 사용할 포인트
-        if (toUse.compareTo(canUsePoint) == 1) { // 사용불가
+        if (!canUse(myPoint, toUse)) {
          throw new IllegalArgumentException("It is exceed saved point");
         }
 
-        //point에서 오래된 point 꺼내서 상태변경
+        // point 조회
         List<Point> points = pointRepository.findPointsByMemberId(command.getMemberId());
 
-        Map<Point, BigDecimal> usePoint = new HashMap<>();
-        Boolean endWhenZero = true;
-        for (Point point : points) {
-            if (endWhenZero) {
-                if (toUse.compareTo(point.getRemainValue()) == 0) {
-                    point.useAllPoint();
-                    endWhenZero = false;
-                    usePoint.put(point, point.getRemainValue());
-                } else if (toUse.compareTo(point.getRemainValue()) < 0) { // 사용할 포인트가 더 적음
-                    point.usePartOfPoint(toUse);
-                    endWhenZero = false;
-                    usePoint.put(point, toUse);
-                } else if (toUse.compareTo(point.getRemainValue()) > 0) {
-                    toUse = toUse.subtract(point.getRemainValue());
-                    point.useAllPoint();
-                    usePoint.put(point, point.getRemainValue());
-                }
-            } else {
-                break;
-            }
-        }
+        // point 사용
+        Map<Point, BigDecimal> usePoint = spendPoint(toUse, points);
 
         //point_hst 저장
         final PointHst hstEntity = command.toHstEntity(member);
@@ -113,19 +96,49 @@ public class PointServiceImpl implements PointService {
 
         // point_hst_point에 저장(롤백을 위해)
         for (Point point : usePoint.keySet()) {
-            PointHstRecord pointHstPoint = PointHstRecord.builder()
-                    .point(point)
-                    .useValue(usePoint.get(point))
-                    .pointHst(saveHst)
-                    .build();
-            pointHistoryPointRepository.save(pointHstPoint);
+            PointHstRecord pointHstRecord = toPointHstRecordEntity(point, saveHst, usePoint.get(point));
+            pointHistoryPointRepository.save(pointHstRecord);
         }
 
         //레디스에 새로운 값 저장
-        BigDecimal totalPoint = canUsePoint.subtract(command.getUsePoint());
+        BigDecimal totalPoint = myPoint.subtract(command.getUsePoint());
         redisService.saveValue(member.getMemberIdx(), totalPoint);
 
         return totalPoint;
+    }
+
+    private PointHstRecord toPointHstRecordEntity(Point point, PointHst pointHst, BigDecimal usePoint) {
+        return PointHstRecord.builder()
+                .point(point)
+                .pointHst(pointHst)
+                .useValue(usePoint)
+                .build();
+    }
+
+    private Map<Point, BigDecimal> spendPoint(BigDecimal toUse, List<Point> points) {
+        Map<Point, BigDecimal> usePoint = new HashMap<>();
+
+        boolean endWhenZero = true;
+        for (Point point : points) {
+            if (endWhenZero) {
+                if (toUse.compareTo(point.getRemainValue()) == 0) {
+                    usePoint.put(point, point.getRemainValue());
+                    point.useAllPoint();
+                    endWhenZero = false;
+                } else if (toUse.compareTo(point.getRemainValue()) < 0) { // 사용할 포인트가 더 적음
+                    usePoint.put(point, toUse);
+                    point.usePartOfPoint(toUse);
+                    endWhenZero = false;
+                } else if (toUse.compareTo(point.getRemainValue()) > 0) {
+                    usePoint.put(point, point.getRemainValue());
+                    toUse = toUse.subtract(point.getRemainValue());
+                    point.useAllPoint();
+                }
+            } else {
+                break;
+            }
+        }
+        return usePoint;
     }
 
     @Override

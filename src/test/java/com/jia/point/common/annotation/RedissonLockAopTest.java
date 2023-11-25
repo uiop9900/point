@@ -2,7 +2,7 @@ package com.jia.point.common.annotation;
 
 import com.jia.point.domain.MemberReader;
 import com.jia.point.domain.MemberService;
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.MemberCommand;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.infrastructure.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
@@ -40,7 +37,7 @@ class RedissonLockAopTest {
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
 
         for (int i = 0; i < numberOfThreads; i++) {
-            MemberDto.Create toCreate = MemberDto.Create.builder()
+            MemberCommand.Create toCreate = MemberCommand.Create.builder()
                     .name("이지아")
                     .phoneNumber(phoneNumber)
                     .build();

@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 public class CreatePointRequest {
 
     @NonNull
+    private String memberIdx;
+
+    @NonNull
     private BigDecimal point;
 
 }

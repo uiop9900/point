@@ -1,6 +1,6 @@
 package com.jia.point.domain.entity;
 
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.MemberCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +42,7 @@ public class Member {
     private List<PointHst> pointHsts;
 
 
-    public static Member toEntity(MemberDto .Create command) {
+    public static Member toEntity(MemberCommand.Create command) {
         return Member.builder()
                 .name(command.getName())
                 .phoneNumber(command.getPhoneNumber())

@@ -1,10 +1,9 @@
 package com.jia.point.domain;
 
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.MemberCommand;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.infrastructure.MemberRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +29,7 @@ class MemberServiceImplTest {
     @Test
     void member_crud_success() {
         //given
-        MemberDto.Create create = MemberDto.Create.builder()
+        MemberCommand.Create create = MemberCommand.Create.builder()
                 .name("이지아")
                 .phoneNumber("01099735424")
                 .build();

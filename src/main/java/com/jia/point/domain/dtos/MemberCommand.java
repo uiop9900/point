@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-public class MemberDto {
+public class MemberCommand {
 
     @Builder
     @Data

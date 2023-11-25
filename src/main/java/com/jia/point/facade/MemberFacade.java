@@ -1,6 +1,6 @@
 package com.jia.point.facade;
 
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.MemberCommand;
 import com.jia.point.domain.MemberService;
 import com.jia.point.domain.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class MemberFacade {
 
     private final RedisService redisService;
 
-    public void signUpMember(MemberDto.Create command) {
+    public void signUpMember(MemberCommand.Create command) {
      memberService.insertMember(command);
     }
 

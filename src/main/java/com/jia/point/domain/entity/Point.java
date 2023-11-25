@@ -65,4 +65,8 @@ public class Point {
         this.useStatus = PointStatus.EXPIRED;
         this.updDt = LocalDateTime.now();
     }
+
+    public static boolean canUse(BigDecimal myPoint, BigDecimal usePoint) {
+        return myPoint.compareTo(usePoint) >= 0; // myPoint >= usePoint
+    }
 }

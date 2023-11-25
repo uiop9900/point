@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-public class PointDto {
+public class PointCommand {
 
     @Builder
     @Data
@@ -28,9 +28,9 @@ public class PointDto {
         private Long memberId;
         private BigDecimal point;
 
-        public static Create toCommand(CreatePointRequest request, String memberIdx) {
+        public static Create toCommand(CreatePointRequest request) {
             return Create.builder()
-                    .memberId(Long.valueOf(memberIdx))
+                    .memberId(Long.valueOf(request.getMemberIdx()))
                     .point(request.getPoint())
                     .build();
         }

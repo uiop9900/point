@@ -1,6 +1,6 @@
 package com.jia.point.facade;
 
-import com.jia.point.domain.dtos.PointDto;
+import com.jia.point.domain.dtos.PointCommand;
 import com.jia.point.domain.PointService;
 import com.jia.point.domain.dtos.PointHstInfo;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +15,11 @@ public class PointFacade {
 
     private final PointService pointService;
 
-    public BigDecimal earnPoint(PointDto.Create command) {
+    public BigDecimal earnPoint(PointCommand.Create command) {
         return pointService.createPoint(command);
     }
 
-    public BigDecimal usePoint(PointDto.Use command) {
+    public BigDecimal usePoint(PointCommand.Use command) {
         return pointService.usePoint(command);
     }
 

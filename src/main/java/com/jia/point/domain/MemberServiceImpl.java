@@ -1,7 +1,6 @@
 package com.jia.point.domain;
 
-import com.jia.point.common.annotation.RedissonLock;
-import com.jia.point.domain.dtos.MemberDto;
+import com.jia.point.domain.dtos.MemberCommand;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.exceptions.MemberException;
 import com.jia.point.infrastructure.MemberRepository;
@@ -24,7 +23,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
-    public void insertMember(MemberDto.Create command) {
+    public void insertMember(MemberCommand.Create command) {
         Optional<Member> member = memberRepository.findMemberByPhoneNumber(command.getPhoneNumber());
 
         if (member.isPresent()) {

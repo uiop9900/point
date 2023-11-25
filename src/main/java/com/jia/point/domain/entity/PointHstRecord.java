@@ -37,4 +37,5 @@ public class PointHstRecord {
     @JoinColumn(name = "point_hst_idx")
     private PointHst pointHst;
 
+
 }

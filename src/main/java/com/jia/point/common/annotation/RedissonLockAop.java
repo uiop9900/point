@@ -43,8 +43,8 @@ public class RedissonLockAop {
             }
 
             log.info("[proceed를 호출합니다.]");
-            return joinPoint.proceed();
-//            return aopForTransaction.proceed(joinPoint);  // 따로 정의된 proceed를 호출함 -> 매번 new Transactional
+//            return joinPoint.proceed();
+            return aopForTransaction.proceed(joinPoint);  // 따로 정의된 proceed를 호출함 -> 매번 new Transactional
         } catch (InterruptedException e) {
             throw new InterruptedException();
         } finally {
