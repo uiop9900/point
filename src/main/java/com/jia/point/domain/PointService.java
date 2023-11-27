@@ -15,7 +15,8 @@ public interface PointService {
     BigDecimal usePoint(PointCommand.Use command);
     List<PointHstInfo> getPointHistories(String memberIdx, Integer page);
 
-    Integer expirePoints();
+    List<Long> findPointsAfterToday();
+    @Transactional Integer expirePoints(Long pointIdx);
 
     @Transactional BigDecimal cancelPoint(Long pointHstIdx, Long memberIdx);
 }

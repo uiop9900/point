@@ -31,8 +31,15 @@ public class PointFacade {
         return pointService.getPointHistories(memberIdx, page);
     }
 
-    public Integer expirePoints() {
-        return pointService.expirePoints();
+    public ExpiredPointData expirePoints() {
+        List<Long> pointsAfterToday = pointService.findPointsAfterToday();
+        Integer result = 0;
+
+        for (Long pointIdx : pointsAfterToday) {
+            result += pointService.expirePoints(pointIdx);
+        }
+
+        return ExpiredPointData.of(pointsAfterToday.size(), result);
     }
 
 }

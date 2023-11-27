@@ -184,13 +184,20 @@ public class PointServiceImpl implements PointService {
         return currentPoint.add(toAdd);
     }
 
+
+    @Override
+    public List<Long> findPointsAfterToday() {
+        List<Point> points = pointRepository.findPointAfterToday(LocalDate.now());
+        return points.stream().map(Point::getPointIdx).toList();
+    }
+
     @Override
     @Transactional
 //    @RedissonLock(key = "point")
-    public Integer expirePoints() {
-        List<Point> pointAfterToday = pointRepository.findPointAfterToday(LocalDate.now());
+    public Integer expirePoints(Long pointIdx) {
+        Point point = pointRepository.findById(pointIdx)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_REQUEST));
 
-        for (Point point : pointAfterToday) {
             // point - 만료
             point.expired();
             // pointHst - 만료로 쌓는다.
@@ -205,7 +212,7 @@ public class PointServiceImpl implements PointService {
             // redis - 계산해서 담는다.
             BigDecimal value = redisService.getValue(point.getMember().getMemberIdx());
             redisService.saveValue(point.getMember().getMemberIdx(), value.subtract(point.getRemainValue()));
-        }
-        return pointAfterToday.size();
+
+        return 1;
     }
 }

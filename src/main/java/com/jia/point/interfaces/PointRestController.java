@@ -1,6 +1,7 @@
 package com.jia.point.interfaces;
 
 import com.jia.point.domain.dtos.PointCommand;
+import com.jia.point.facade.ExpiredPointData;
 import com.jia.point.facade.MemberFacade;
 import com.jia.point.facade.PointFacade;
 import com.jia.point.interfaces.dtos.CommonResponse;
@@ -60,8 +61,12 @@ public class PointRestController {
     @Scheduled(cron = "0 0 * * * ") // 매일 자정(밤 12시)
     public void expirePoints() {
         log.info("[SCHEDULED] 포인트 만료 시작합니다. today = {}", LocalDate.now());
-        Integer points = pointFacade.expirePoints();
-        log.info("[SCHEDULED] 포인트 만료 종료합니다. expirePontsNumber ={}", points);
+        ExpiredPointData result = pointFacade.expirePoints();
+        if (result.getExpired() != result.getToExpire()) {
+            log.error("[SCHEDULED] 만료되지 않는 포인트가 존재합니다. {}건", result.getToExpire() - result.getExpired());
+        }
+        log.info("[SCHEDULED] 포인트 만료 종료합니다. toExpire ={}, expired = {}", result.getToExpire(), result.getExpired());
+
     }
 
 
