@@ -66,6 +66,13 @@ public class Point {
         this.updDt = LocalDateTime.now();
     }
 
+    public void canceled(BigDecimal cancelAmt) {
+        this.remainValue = this.remainValue.add(cancelAmt);
+        this.useStatus = PointStatus.CANCEL;
+        this.updDt = LocalDateTime.now();
+    }
+
+
     public static boolean canUse(BigDecimal myPoint, BigDecimal usePoint) {
         return myPoint.compareTo(usePoint) >= 0; // myPoint >= usePoint
     }

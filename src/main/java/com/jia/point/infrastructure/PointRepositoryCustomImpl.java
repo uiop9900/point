@@ -22,7 +22,7 @@ public class PointRepositoryCustomImpl implements PointRepositoryCustom {
         return queryFactory.selectFrom(point)
                 .where(
                         point.member.memberIdx.eq(memberId)
-                                .and(point.useStatus.in(PointStatus.USING, PointStatus.UNUSED))
+                                .and(point.useStatus.in(PointStatus.USING, PointStatus.UNUSED, PointStatus.CANCEL))
                 )
                 .orderBy(point.regDt.asc())
                 .fetch();

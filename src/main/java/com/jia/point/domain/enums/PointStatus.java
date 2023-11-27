@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum PointStatus {
-    UNUSED("미사용"),
-    USING("사용중"),
+    UNUSED("미사용", true),
+    USING("사용중", true),
+    CANCEL("취소", true),
+    COMPLETE("사용완료", false),
 
-    COMPLETE("사용완료"),
-    EXPIRED("만료");
+    EXPIRED("만료", false);
 
     private final String description;
+
+    private final Boolean canUse;
 
 }

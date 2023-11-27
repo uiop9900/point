@@ -1,5 +1,6 @@
 package com.jia.point.domain;
 
+import com.jia.point.domain.dtos.MemberCommand;
 import com.jia.point.domain.dtos.PointCommand;
 import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -25,6 +28,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -49,7 +55,7 @@ class PointServiceImplTest {
     @Autowired
     EntityManager em;
 
-    @BeforeEach
+//    @BeforeEach
     void insertInitData() {
         Member toSave = Member.builder()
                 .name("이지아")
@@ -169,6 +175,49 @@ class PointServiceImplTest {
 
         // then
         assertThat(expirePoints).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("적립과 사용이 동시에")
+    @Transactional
+    void point_적립과_사용을_동시에_한다() throws InterruptedException {
+        // given
+        BigDecimal point = new BigDecimal(100);
+        BigDecimal usePoint = new BigDecimal(50);
+
+        Member member = memberRepository.save(Member.toEntity(MemberCommand.Create
+                .builder()
+                .name("user")
+                .phoneNumber("01012341234")
+                .build()));
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2); // 스레드 풀 생성
+
+        // earnPoint 메소드를 호출하는 스레드
+        executorService.submit(() -> {
+            pointService.createPoint(PointCommand.Create.builder()
+                            .memberId(member.getMemberIdx())
+                            .point(point)
+                    .build());
+        });
+
+        // usePoint 메소드를 호출하는 스레드
+        executorService.submit(() -> {
+            pointService.usePoint(PointCommand.Use.builder()
+                            .memberId(member.getMemberIdx())
+                            .usePoint(usePoint)
+                    .build());
+        });
+
+
+        executorService.shutdown(); // 스레드 풀 종료
+        executorService.awaitTermination(5, TimeUnit.SECONDS); // 최대 5초까지 대기
+
+        Page<PointHst> pointHsts = pointHistoryRepository.findAllByMember(member, PageRequest.of(0, 10));
+        org.assertj.core.api.Assertions.assertThat(pointHsts.stream().toList().size()).isEqualTo(3);
+
+
+
     }
 
     private void flushAndClear() {

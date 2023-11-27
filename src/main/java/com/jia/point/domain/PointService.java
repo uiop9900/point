@@ -16,4 +16,6 @@ public interface PointService {
     List<PointHstInfo> getPointHistories(String memberIdx, Integer page);
 
     Integer expirePoints();
+
+    @Transactional BigDecimal cancelPoint(Long pointHstIdx, Long memberIdx);
 }

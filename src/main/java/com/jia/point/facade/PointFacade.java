@@ -23,6 +23,9 @@ public class PointFacade {
         return pointService.usePoint(command);
     }
 
+    public BigDecimal cancelPoint(Long poinHstIdx, Long memberIdx) {
+        return pointService.cancelPoint(poinHstIdx, memberIdx);
+    }
 
     public List<PointHstInfo> getPointHistories(String memberIdx, Integer page) {
         return pointService.getPointHistories(memberIdx, page);

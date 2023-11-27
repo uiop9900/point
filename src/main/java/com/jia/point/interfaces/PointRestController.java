@@ -9,6 +9,7 @@ import com.jia.point.interfaces.dtos.UsePointRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,10 +44,20 @@ public class PointRestController {
     }
 
     /**
+     * 포인트 취소<br>
+     * 유저별 목록조회 화면에서 history 번호를 받아올거라 판단
+     */
+    @PostMapping("/point/cancel")
+    public CommonResponse<BigDecimal> cancelPoint(@RequestBody CancelPointRequest request) {
+        return CommonResponse.success(pointFacade.cancelPoint(request.getPointHstIdx(), request.getMemberIdx()));
+    }
+
+
+    /**
      * 포인트 만료
      */
     @PostMapping("/point/expire/{today}")
-    @Scheduled(cron = "0 4 * * * ") // 매일 새벽 5시
+    @Scheduled(cron = "0 0 * * * ") // 매일 자정(밤 12시)
     public void expirePoints() {
         log.info("[SCHEDULED] 포인트 만료 시작합니다. today = {}", LocalDate.now());
         Integer points = pointFacade.expirePoints();

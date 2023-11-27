@@ -8,7 +8,7 @@ import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.entity.PointHstRecord;
 import com.jia.point.domain.enums.PointUseType;
 import com.jia.point.domain.dtos.PointHstInfo;
-import com.jia.point.infrastructure.PointHistoryPointRepository;
+import com.jia.point.infrastructure.PointHstRecordRepository;
 import com.jia.point.infrastructure.PointHistoryRepository;
 import com.jia.point.infrastructure.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.jia.point.domain.entity.Point.canUse;
+import static com.jia.point.domain.exceptions.ErrorMessage.INVALID_REQUEST;
 
 @Slf4j
 @Service
@@ -39,7 +41,7 @@ public class PointServiceImpl implements PointService {
 
     private final PointHistoryRepository pointHistoryRepository;
 
-    private final PointHistoryPointRepository pointHistoryPointRepository;
+    private final PointHstRecordRepository pointHstRecordRepository;
 
     private final MemberReader memberReader;
 
@@ -49,6 +51,7 @@ public class PointServiceImpl implements PointService {
     @Override
     @RedissonLock(key = "point")
     public BigDecimal createPoint(PointCommand.Create command) {
+        log.error("creatPoint");
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // point 적립
@@ -71,6 +74,7 @@ public class PointServiceImpl implements PointService {
     @Transactional
     @RedissonLock(key = "point")
     public BigDecimal usePoint(PointCommand.Use command) {
+        log.error("usePoint");
         // 사용할 포인트
         BigDecimal toUse = command.getUsePoint();
 
@@ -81,7 +85,7 @@ public class PointServiceImpl implements PointService {
         BigDecimal myPoint = redisService.getValue(command.getMemberId());
 
         if (!canUse(myPoint, toUse)) {
-         throw new IllegalArgumentException("It is exceed saved point");
+            throw new IllegalArgumentException("It is exceed saved point");
         }
 
         // point 조회
@@ -97,7 +101,7 @@ public class PointServiceImpl implements PointService {
         // point_hst_point에 저장(롤백을 위해)
         for (Point point : usePoint.keySet()) {
             PointHstRecord pointHstRecord = toPointHstRecordEntity(point, saveHst, usePoint.get(point));
-            pointHistoryPointRepository.save(pointHstRecord);
+            pointHstRecordRepository.save(pointHstRecord);
         }
 
         //레디스에 새로운 값 저장
@@ -149,6 +153,35 @@ public class PointServiceImpl implements PointService {
         Page<PointHst> list = pointHistoryRepository.findAllByMember(member, pageable);
 
         return list.stream().map(PointHstInfo::of).toList();
+    }
+
+    @Override
+    @Transactional
+    public BigDecimal cancelPoint(Long pointHstIdx, Long memberIdx) {
+        // 해당하는 record를 가지고 온다. -> list로
+        PointHst pointHst = pointHistoryRepository.findById(pointHstIdx)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_REQUEST));
+
+        List<PointHstRecord> records = pointHstRecordRepository.findAllByPointHst(pointHst);
+
+        // 해당 포인트의 만료시간을 확인하고 만료시간이 지났으면 그대로 만료 처리
+        LocalDate today = LocalDate.now();
+        BigDecimal toAdd = null;
+
+        for (PointHstRecord record : records) {
+            if (today.isAfter(record.getPoint().getExpiredDate())) { // 오늘이 이후다.
+                // 만료
+                record.getPoint().expired();
+            }
+            // 원복
+            record.getPoint().canceled(record.getUseValue());
+            toAdd = toAdd.add(record.getUseValue());
+        }
+
+        BigDecimal currentPoint = redisService.getValue(memberIdx);
+        redisService.saveValue(memberIdx, currentPoint.add(toAdd));
+
+        return currentPoint.add(toAdd);
     }
 
     @Override
