@@ -171,10 +171,10 @@ class PointServiceImplTest {
         }
 
         // when
-//        Integer expirePoints = pointService.expirePoints(5, 5);
+        Integer expirePoints = pointService.expirePoints(5L);
 
         // then
-//        assertThat(expirePoints).isEqualTo(5);
+        assertThat(expirePoints).isEqualTo(5L);
     }
 
     @Test
@@ -215,8 +215,60 @@ class PointServiceImplTest {
 
         Page<PointHst> pointHsts = pointHistoryRepository.findAllByMember(member, PageRequest.of(0, 10));
         org.assertj.core.api.Assertions.assertThat(pointHsts.stream().toList().size()).isEqualTo(3);
+    }
 
+    @Test
+    @DisplayName("포인트 동시성")
+    @Transactional
+    void point_한꺼번에_여러개의_적립요청을_한다() throws InterruptedException {
+        // given
+        BigDecimal point = new BigDecimal(10);
 
+        Member member = memberRepository.findByMemberIdx(15L).get();
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2); // 스레드 풀 생성
+
+        // 스레드1 - 10번의 적립
+        for (int i = 0; i < 10; i++) {
+            executorService.submit(() -> {
+                pointService.createPoint(PointCommand.Create.builder()
+                        .memberId(member.getMemberIdx())
+                        .point(point)
+                        .build());
+                try {
+                    Thread.sleep(1000); // 1초 동안 대기
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+// 스레드2 - 10번의 적립
+            for (int i = 0; i < 10; i++) {
+        executorService.submit(() -> {
+                pointService.createPoint(PointCommand.Create.builder()
+                        .memberId(member.getMemberIdx())
+                        .point(point)
+                        .build());
+                try {
+                    Thread.sleep(1000); // 1초 동안 대기
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        });
+            }
+
+        executorService.shutdown(); // 스레드 풀 종료
+        executorService.awaitTermination(5, TimeUnit.SECONDS); // 최대 5초까지 대기
+
+        Page<PointHst> pointHsts = pointHistoryRepository.findAllByMember(member, PageRequest.of(0, 100));
+        List<PointHst> list = pointHsts.stream().toList();
+
+        BigDecimal value = redisService.getValue(member.getMemberIdx());
+
+        // 요청횟수가 20번이고, 다 알맞게 저장되었다.
+        assertThat(list.size()).isEqualTo(20);
+        assertThat(200).isEqualTo(value);
 
     }
 
