@@ -8,6 +8,7 @@ import com.jia.point.interfaces.dtos.CancelPointRequest;
 import com.jia.point.interfaces.dtos.CommonResponse;
 import com.jia.point.interfaces.dtos.CreatePointRequest;
 import com.jia.point.interfaces.dtos.UsePointRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +33,7 @@ public class PointRestController {
      * 포인트 적립
      */
     @PostMapping("/point/earn")
-    public CommonResponse<BigDecimal> createPoint(@RequestBody CreatePointRequest request) {
+    public CommonResponse<BigDecimal> createPoint(@RequestBody @Valid CreatePointRequest request) {
         return CommonResponse.success(pointFacade.earnPoint(PointCommand.Create.toCommand(request)));
     }
 
@@ -40,7 +41,7 @@ public class PointRestController {
      * 포인트 사용
      */
     @PostMapping("/point/use")
-    public CommonResponse<BigDecimal> usePoint(@RequestBody UsePointRequest request) {
+    public CommonResponse<BigDecimal> usePoint(@RequestBody @Valid UsePointRequest request) {
         return CommonResponse.success(pointFacade.usePoint(PointCommand.Use.toCommand(request)));
     }
 
@@ -49,7 +50,7 @@ public class PointRestController {
      * 유저별 목록조회 화면에서 history 번호를 받아올거라 판단
      */
     @PostMapping("/point/cancel")
-    public CommonResponse<BigDecimal> cancelPoint(@RequestBody CancelPointRequest request) {
+    public CommonResponse<BigDecimal> cancelPoint(@RequestBody @Valid CancelPointRequest request) {
         return CommonResponse.success(pointFacade.cancelPoint(request.getPointHstIdx(), request.getMemberIdx()));
     }
 
