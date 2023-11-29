@@ -13,7 +13,12 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * @RedissonLock 선언 시 수행되는 AOP
+ * @RedissonLock 선언 시 수행되는 AOP<br>
+ * 정상적으로 lock이 잡히게 되면 아래와 같이 로그가 뜬다. <br>
+ * [lock을 시도합니다.]<br>
+ * [proceed를 호출합니다.]<br>
+ * [unLock을 시도합니다.]<br>
+ *
  */
 @Aspect
 @Component
@@ -42,8 +47,8 @@ public class RedissonLockAop {
                 return false;
             }
 
-            log.info("[proceed를 호출합니다.]");
 //            return joinPoint.proceed();
+            log.info("[proceed를 호출합니다.]");
             return aopForTransaction.proceed(joinPoint);  // 따로 정의된 proceed를 호출함 -> 매번 new Transactional
         } catch (InterruptedException e) {
             throw new InterruptedException();

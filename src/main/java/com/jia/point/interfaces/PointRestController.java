@@ -66,7 +66,6 @@ public class PointRestController {
             log.error("[SCHEDULED] 만료되지 않는 포인트가 존재합니다. {}건", result.getToExpire() - result.getExpired());
         }
         log.info("[SCHEDULED] 포인트 만료 종료합니다. toExpire ={}, expired = {}", result.getToExpire(), result.getExpired());
-
     }
 
 

@@ -1,16 +1,26 @@
 package com.jia.point.domain;
 
+import static com.jia.point.domain.entity.Point.canUse;
+import static com.jia.point.domain.exceptions.ErrorMessage.CANNOT_EXCEED_PRESENT_POINT;
+import static com.jia.point.domain.exceptions.ErrorMessage.INVALID_REQUEST;
+
 import com.jia.point.common.annotation.RedissonLock;
 import com.jia.point.domain.dtos.PointCommand;
+import com.jia.point.domain.dtos.PointHstInfo;
 import com.jia.point.domain.entity.Member;
 import com.jia.point.domain.entity.Point;
 import com.jia.point.domain.entity.PointHst;
 import com.jia.point.domain.entity.PointHstRecord;
 import com.jia.point.domain.enums.PointUseType;
-import com.jia.point.domain.dtos.PointHstInfo;
-import com.jia.point.infrastructure.PointHstRecordRepository;
+import com.jia.point.domain.exceptions.PointException;
 import com.jia.point.infrastructure.PointHistoryRepository;
+import com.jia.point.infrastructure.PointHstRecordRepository;
 import com.jia.point.infrastructure.PointRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,16 +28,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.jia.point.domain.entity.Point.canUse;
-import static com.jia.point.domain.exceptions.ErrorMessage.INVALID_REQUEST;
 
 @Slf4j
 @Service
@@ -47,11 +47,9 @@ public class PointServiceImpl implements PointService {
 
     private final RedisService redisService;
 
-    @Transactional
     @Override
     @RedissonLock(key = "point")
     public BigDecimal createPoint(PointCommand.Create command) {
-        log.error("creatPoint");
         Member member = memberReader.findByMemberId(command.getMemberId());
 
         // point 적립
@@ -71,10 +69,8 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Transactional
     @RedissonLock(key = "point")
     public BigDecimal usePoint(PointCommand.Use command) {
-        log.error("usePoint");
         // 사용할 포인트
         BigDecimal toUse = command.getUsePoint();
 
@@ -85,7 +81,7 @@ public class PointServiceImpl implements PointService {
         BigDecimal myPoint = redisService.getValue(command.getMemberId());
 
         if (!canUse(myPoint, toUse)) {
-            throw new IllegalArgumentException("It is exceed saved point");
+            throw new PointException(CANNOT_EXCEED_PRESENT_POINT);
         }
 
         // point 조회
@@ -192,21 +188,20 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Transactional
-//    @RedissonLock(key = "point")
+    @RedissonLock(key = "point")
     public Integer expirePoints(Long pointIdx) {
         Point point = pointRepository.findById(pointIdx)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_REQUEST));
 
             // point - 만료
             point.expired();
+
             // pointHst - 만료로 쌓는다.
             PointHst toSave = PointHst.builder()
                     .value(point.getRemainValue())
                     .pointUseType(PointUseType.EXPIRED)
                     .member(point.getMember())
                     .build();
-
             pointHistoryRepository.save(toSave);
 
             // redis - 계산해서 담는다.

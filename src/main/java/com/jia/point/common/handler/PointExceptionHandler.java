@@ -1,20 +1,19 @@
 package com.jia.point.common.handler;
 
-import com.jia.point.interfaces.dtos.ServerErrorResponse;
+import com.jia.point.domain.exceptions.PointException;
+import com.jia.point.interfaces.dtos.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class PointExceptionHandler {
 
-    // IllegalArgumentException 터뜨리면 여기서 잡아서 준다.
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ServerErrorResponse> handlerBackEndException() {
-        return new ResponseEntity<ServerErrorResponse>(ServerErrorResponse.response(), HttpStatusCode.valueOf(500));
+    @ExceptionHandler(PointException.class)
+    public CommonResponse pointExceptionHandler(PointException e) {
+        return CommonResponse.fail(e.getMessage());
     }
+
 }
 
