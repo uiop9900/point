@@ -26,12 +26,8 @@ public class MemberRestController {
      */
     @PostMapping("/sign-up")
     public CommonResponse<Boolean> createMember(@RequestBody CreateMemberRequest request) {
-        try {
-            memberFacade.signUpMember(MemberCommand.Create.toCommand(request));
-            return CommonResponse.success(Boolean.TRUE);
-        } catch (MemberException e) {
-            return CommonResponse.fail(e.getMessage());
-        }
+        memberFacade.signUpMember(MemberCommand.Create.toCommand(request));
+        return CommonResponse.success(Boolean.TRUE);
     }
 
     /**
