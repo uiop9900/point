@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PointServiceImpl implements PointService {
 
-    private final Integer SELECT_SIZE = 10;
+    private final PointReader pointReader;
 
-    private final PointRepository pointRepository;
-
-    private final PointHistoryRepository pointHistoryRepository;
-
-    private final PointHstRecordRepository pointHstRecordRepository;
+    private final PointStore pointStore;
 
     private final MemberReader memberReader;
 
@@ -54,11 +47,11 @@ public class PointServiceImpl implements PointService {
 
         // point 적립
         final Point pointSave = command.toPointEntity(member);
-        pointRepository.save(pointSave);
+        pointStore.save(pointSave);
 
         // point_hst 에 적립
         final PointHst pointHstSave = command.toPointHstEntity(member);
-        pointHistoryRepository.save(pointHstSave);
+        pointStore.save(pointHstSave);
 
         // redis에 저장
         BigDecimal value = redisService.getValue(member.getMemberIdx());
@@ -85,19 +78,19 @@ public class PointServiceImpl implements PointService {
         }
 
         // point 조회
-        List<Point> points = pointRepository.findPointsByMemberId(command.getMemberId());
+        List<Point> points = pointReader.findPointsByMemberId(command.getMemberId());
 
         // point 사용
         Map<Point, BigDecimal> usePoint = spendPoint(toUse, points);
 
         //point_hst 저장
         final PointHst hstEntity = command.toHstEntity(member);
-        PointHst saveHst = pointHistoryRepository.save(hstEntity);
+        PointHst saveHst = pointStore.save(hstEntity);
 
         // point_hst_point에 저장(롤백을 위해)
         for (Point point : usePoint.keySet()) {
             PointHstRecord pointHstRecord = toPointHstRecordEntity(point, saveHst, usePoint.get(point));
-            pointHstRecordRepository.save(pointHstRecord);
+            pointStore.save(pointHstRecord);
         }
 
         //레디스에 새로운 값 저장
@@ -144,10 +137,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<PointHstInfo> getPointHistories(String memberIdx, Integer page) {
         Member member = memberReader.findByMemberId(Long.valueOf(memberIdx));
-
-        Pageable pageable = PageRequest.of(page, SELECT_SIZE);
-        Page<PointHst> list = pointHistoryRepository.findAllByMember(member, pageable);
-
+        final List<PointHst> list = pointReader.findPointsByMember(member, page);
         return list.stream().map(PointHstInfo::of).toList();
     }
 
@@ -155,10 +145,9 @@ public class PointServiceImpl implements PointService {
     @Transactional
     public BigDecimal cancelPoint(Long pointHstIdx, Long memberIdx) {
         // 해당하는 record를 가지고 온다. -> list로
-        PointHst pointHst = pointHistoryRepository.findById(pointHstIdx)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_REQUEST));
+        PointHst pointHst = pointReader.findPointHstByIdx(pointHstIdx);
 
-        List<PointHstRecord> records = pointHstRecordRepository.findAllByPointHst(pointHst);
+        List<PointHstRecord> records = pointReader.findRecordsByPointHst(pointHst);
 
         // 해당 포인트의 만료시간을 확인하고 만료시간이 지났으면 그대로 만료 처리
         LocalDate today = LocalDate.now();
@@ -183,15 +172,14 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<Long> findPointsAfterToday() {
-        List<Point> points = pointRepository.findPointAfterToday(LocalDate.now());
+        List<Point> points = pointReader.findPointAfterToday(LocalDate.now());
         return points.stream().map(Point::getPointIdx).toList();
     }
 
     @Override
     @RedissonLock(key = "point")
     public Integer expirePoints(Long pointIdx) {
-        Point point = pointRepository.findById(pointIdx)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_REQUEST));
+        Point point = pointReader.findPointByIdx(pointIdx);
 
             // point - 만료
             point.expired();
@@ -202,7 +190,7 @@ public class PointServiceImpl implements PointService {
                     .pointUseType(PointUseType.EXPIRED)
                     .member(point.getMember())
                     .build();
-            pointHistoryRepository.save(toSave);
+            pointStore.save(toSave);
 
             // redis - 계산해서 담는다.
             BigDecimal value = redisService.getValue(point.getMember().getMemberIdx());
