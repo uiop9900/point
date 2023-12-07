@@ -84,4 +84,24 @@ public class PointCommand {
                 .build();
         }
     }
+
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor(staticName = "of")
+    public static class Expired {
+
+        private Point point;
+
+        public PointHst toHstEntity() {
+            Member member = point.getMember();
+            return PointHst.builder()
+                    .member(member)
+                    .value(point.getRemainValue())
+                    .pointUseType(PointUseType.EXPIRED)
+                    .regDt(LocalDateTime.now())
+                    .build();
+        }
+    }
 }

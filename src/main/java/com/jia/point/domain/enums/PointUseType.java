@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 public enum PointUseType {
     EARN("적립"),
     USE("사용"),
-    EXPIRED("만료");
+    EXPIRED("만료"),
+
+    CANCEL("취소")
+    ;
 
     private final String description;
 

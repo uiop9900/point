@@ -147,26 +147,33 @@ public class PointServiceImpl implements PointService {
         // 해당하는 record를 가지고 온다. -> list로
         PointHst pointHst = pointReader.findPointHstByIdx(pointHstIdx);
 
+        // 취소 금액
         List<PointHstRecord> records = pointReader.findRecordsByPointHst(pointHst);
+        BigDecimal canceledValue = records.stream().map(PointHstRecord::getUseValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        // 취소 금액 원복
+        BigDecimal currentPoint = redisService.getValue(memberIdx);
+        redisService.saveValue(memberIdx, currentPoint.add(canceledValue));
 
         // 해당 포인트의 만료시간을 확인하고 만료시간이 지났으면 그대로 만료 처리
         LocalDate today = LocalDate.now();
-        BigDecimal toAdd = null;
 
         for (PointHstRecord record : records) {
             if (today.isAfter(record.getPoint().getExpiredDate())) { // 오늘이 이후다.
                 // 만료
                 record.getPoint().expired();
+                this.expirePoints(record.getPoint().getPointIdx());
             }
-            // 원복
+
+            // 취소
             record.getPoint().canceled(record.getUseValue());
-            toAdd = toAdd.add(record.getUseValue());
+            PointHst expired = PointCommand.Expired.of(record.getPoint()).toHstEntity();
+            pointStore.save(expired);
         }
 
-        BigDecimal currentPoint = redisService.getValue(memberIdx);
-        redisService.saveValue(memberIdx, currentPoint.add(toAdd));
-
-        return currentPoint.add(toAdd);
+        return redisService.getValue(memberIdx);
     }
 
 
@@ -185,11 +192,8 @@ public class PointServiceImpl implements PointService {
             point.expired();
 
             // pointHst - 만료로 쌓는다.
-            PointHst toSave = PointHst.builder()
-                    .value(point.getRemainValue())
-                    .pointUseType(PointUseType.EXPIRED)
-                    .member(point.getMember())
-                    .build();
+            PointCommand.Expired expired = PointCommand.Expired.of(point);
+            PointHst toSave = expired.toHstEntity();
             pointStore.save(toSave);
 
             // redis - 계산해서 담는다.
