@@ -80,4 +80,4 @@ src/main/java
 - 동시성 제어 테스트 (w. jmeter)
   - 100명의 사용자가 동시에 `적립`과 `사용`을 하는 경우
   - 정상적으로 락 발동 -> 하나씩 잘 쌓인다.
-    - ![스크린샷 2023-12-07 오후 9.19.47.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2F_z%2Fr2vft7pd27d37djvf7wsr3dr0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_G8y0Yn%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202023-12-07%20%EC%98%A4%ED%9B%84%209.19.47.png)
+    - ![스크린샷](./image/concurrency.png)
