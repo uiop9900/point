@@ -55,7 +55,7 @@ class PointServiceImplTest {
     @Autowired
     EntityManager em;
 
-//    @BeforeEach
+    @BeforeEach
     void insertInitData() {
         Member toSave = Member.builder()
                 .name("이지아")
@@ -119,7 +119,7 @@ class PointServiceImplTest {
         // given
         Long memberId = 1L;
         BigDecimal canUse = redisService.getValue(memberId);
-        BigDecimal tryUse = canUse.add(BigDecimal.valueOf(1000));
+        BigDecimal tryUse = canUse.add(BigDecimal.valueOf(100000));
 
         PointCommand.Use toUpdate = PointCommand.Use.builder()
                 .memberId(memberId)
