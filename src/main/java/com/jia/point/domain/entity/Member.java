@@ -42,6 +42,7 @@ public class Member {
     private List<PointHst> pointHsts;
 
 
+    // TODO command에서 변환 진행, 엔티티에서는 하지 않는다.
     public static Member toEntity(MemberCommand.Create command) {
         return Member.builder()
                 .name(command.getName())

@@ -29,6 +29,7 @@ public class PointRestController {
     private final PointFacade pointFacade;
 
 
+    // TODO: api url은 복수형으로 변경
     /**
      * 포인트 적립
      */

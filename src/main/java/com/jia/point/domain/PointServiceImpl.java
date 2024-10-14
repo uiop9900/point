@@ -40,6 +40,12 @@ public class PointServiceImpl implements PointService {
 
     private final RedisService redisService;
 
+    // TODO 히스토리 저장 방식에 대해 좀 더 생각하기
+    // TODO redis 저장 방식에 대해 좀 더 생각하기
+    // TODO creatPoint가 맞나? 함수명을 좀 더 생각하기
+    // TODO 비즈니스 로직에 hst, redis가 너무 많다.
+
+
     @Override
     @RedissonLock(key = "point")
     public BigDecimal createPoint(PointCommand.Create command) {
@@ -100,6 +106,7 @@ public class PointServiceImpl implements PointService {
         return totalPoint;
     }
 
+    // TODO: 객체변환은 command 안에서 하기
     private PointHstRecord toPointHstRecordEntity(Point point, PointHst pointHst, BigDecimal usePoint) {
         return PointHstRecord.builder()
                 .point(point)
