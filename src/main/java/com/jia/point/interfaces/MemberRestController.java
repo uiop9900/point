@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberRestController {
 
@@ -33,7 +33,7 @@ public class MemberRestController {
     /**
      * 사용자별 포인트 내역 조회
      */
-    @GetMapping("/point/{memberIdx}/{page}")
+    @GetMapping("/points/{memberIdx}/{page}")
     public CommonResponse<List<PointHstInfo>> getPointHistories(@PathVariable String memberIdx, @PathVariable String page) {
         return CommonResponse.success(pointFacade.getPointHistories(memberIdx, Integer.valueOf(page)));
     }
